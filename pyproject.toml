@@ -1,0 +1,53 @@
+[project]
+name = "findoc-rag"
+version = "0.1.0"
+description = "财务报表 RAG 问答系统"
+requires-python = ">=3.12"
+dependencies = [
+    # --- Ingestion ---
+    "pdfplumber>=0.11.0",
+    "python-docx>=1.1.0",
+    "python-pptx>=1.0.0",
+    "openpyxl>=3.1.0",
+    # --- Chunking ---
+    "llama-index-core>=0.14.0",
+    # --- Embedding & Reranker ---
+    "sentence-transformers>=3.0.0",
+    # --- Storage ---
+    "chromadb>=0.6.0",
+    # --- API ---
+    "fastapi>=0.100.0",
+    "uvicorn>=0.23.0",
+    "pydantic>=2.0.0",
+    "python-dotenv>=1.0.0",
+    # --- LLM（OpenAI-compatible SDK，兼容 Kimi / Qwen）---
+    "openai>=1.0.0",
+    # --- Evaluation（Ragas + LangChain wrapper）---
+    "ragas>=0.4,<0.5",
+    "datasets>=2.14.0",
+    "langchain-openai>=0.1.0",
+    "langchain-community>=0.2.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=9.0.0",
+    "pytest-asyncio>=0.23.0",
+]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.mypy]
+python_version = "3.12"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false

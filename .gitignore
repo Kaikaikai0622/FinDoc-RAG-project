@@ -1,0 +1,45 @@
+# ========== 核心：API密钥（必须排除）==========
+.env
+.env.local
+.env.*.local
+
+# ========== 文档数据（向量数据库 + SQLite）==========
+data/chroma_db/
+data/doc_store.db
+
+# ========== Python ==========
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+env/
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+*.log
+
+# ========== IDE ==========
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# ========== OS ==========
+.DS_Store
+Thumbs.db
+
+# ========== 保留空目录 ==========
+/.claude/
+/docs/
+/data/eval/annotation/
+/data/eval/reports/
+/data/eval/experiments/
+/data/eval/history/

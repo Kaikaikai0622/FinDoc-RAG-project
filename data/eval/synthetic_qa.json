@@ -1,0 +1,520 @@
+{
+  "_schema_version": "1.1",
+  "questions": [
+    {
+      "id": "s001",
+      "question": "我在中兴通讯2025年年报第28页看到管理费用和营业收入的数据，想确认管理费用占营收的比例具体是多少，这一比例跟2024年相比又降了几个点？",
+      "ground_truth": "管理费用占营业收入比例为3.15%，同比下降0.54个百分点。",
+      "source_files": [
+        "中兴通讯：2025年年度报告.pdf"
+      ],
+      "source_pages": [
+        28
+      ],
+      "scene": "factual",
+      "difficulty": "easy",
+      "metadata": {
+        "report_scope": "unspecified",
+        "generalization_excluded": true
+      }
+    },
+    {
+      "id": "s002",
+      "question": "能否告诉我，中兴通讯公布的2025年年报里，非流动资产合计和资产总计各是多少？",
+      "ground_truth": "非流动资产合计 62,936,979；资产总计 204,303,188",
+      "source_files": [
+        "中兴通讯：2025年年度报告.pdf"
+      ],
+      "source_pages": [
+        108
+      ],
+      "scene": "factual",
+      "difficulty": "easy",
+      "metadata": {
+        "report_scope": "unspecified",
+        "generalization_excluded": true
+      }
+    },
+    {
+      "id": "s003",
+      "question": "想了解一下中兴通讯把中兴新集团列为长期供应商的主要考量是什么？另外，公司具体向对方采购哪些类别的原材料，能不能分门别类地说明一下？",
+      "ground_truth": "主要考量：中兴新集团能持续以具竞争力的价格提供优质产品与服务，且已通过本集团资格认证和招标程序，被视为可靠合作的长期供应商，可保障本集团按时按质获得所需部件。采购类别：机柜及配件、天线抱杆（文档仅列出这两项，其余类别未披露）。",
+      "source_files": [
+        "中兴通讯：2025年年度报告.pdf"
+      ],
+      "source_pages": [
+        81
+      ],
+      "scene": "extraction",
+      "difficulty": "easy"
+    },
+    {
+      "id": "s004",
+      "question": "AI Booster智算训推平台到底用了什么办法把底层不同厂商的加速卡差异封装起来，让我能像在统一资源池里一样随意调用各种算力？",
+      "ground_truth": "向下屏蔽底层异构加速硬件差异，提供多样化算力的灵活调度",
+      "source_files": [
+        "中兴通讯：2025年年度报告.pdf"
+      ],
+      "source_pages": [
+        18
+      ],
+      "scene": "extraction",
+      "difficulty": "medium",
+      "metadata": {
+        "report_scope": "unspecified",
+        "generalization_excluded": true
+      }
+    },
+    {
+      "id": "s005",
+      "question": "我在2025年年报第170页看到中兴通讯给融资项目计提了风险补偿金，想确认一下，这些补偿金得满足哪些具体条件，公司才会按原来的比例把它转回？",
+      "ground_truth": "对于已计提风险补偿金的融资项目，在约定最后到期日未发生融资款本息逾期，或者已全部还清银行融资本息，公司即按原比例释放对应的风险补偿金。",
+      "source_files": [
+        "中兴通讯：2025年年度报告.pdf"
+      ],
+      "source_pages": [
+        170
+      ],
+      "scene": "policy_qa",
+      "difficulty": "easy",
+      "metadata": {
+        "report_scope": "unspecified",
+        "generalization_excluded": true
+      }
+    },
+    {
+      "id": "s006",
+      "question": "在山东药玻2025年年报里，账龄落在4到5年的那部分应收账款，期末还剩多少余额？",
+      "ground_truth": "1,186,012.52",
+      "source_files": [
+        "山东药玻：2025年年度报告.pdf"
+      ],
+      "source_pages": [
+        194
+      ],
+      "scene": "extraction",
+      "difficulty": "easy",
+      "metadata": {
+        "report_scope": "unspecified",
+        "generalization_excluded": true
+      }
+    },
+    {
+      "id": "s007",
+      "question": "山东药玻在2025年度财报里，对山东沂源农村商业银行那笔‘其他权益工具投资’，年初和年底的账面余额分别是多少元？",
+      "ground_truth": "年初50,000.00元，年底50,000.00元",
+      "source_files": [
+        "山东药玻：2025年年度报告.pdf"
+      ],
+      "source_pages": [
+        145
+      ],
+      "scene": "factual",
+      "difficulty": "easy",
+      "metadata": {
+        "report_scope": "unspecified",
+        "generalization_excluded": true
+      }
+    },
+    {
+      "id": "s008",
+      "question": "想查一下山东药玻2025年报里，到年底还没付出去的股利在其他应付款里挂了多少元？",
+      "ground_truth": "27,826,674.40",
+      "source_files": [
+        "山东药玻：2025年年度报告.pdf"
+      ],
+      "source_pages": [
+        73
+      ],
+      "scene": "extraction",
+      "difficulty": "easy",
+      "metadata": {
+        "report_scope": "unspecified",
+        "generalization_excluded": true
+      }
+    },
+    {
+      "id": "s009",
+      "question": "山东药玻在2025年年报里提到，因为执行新的《企业会计准则》追溯调整，导致期初未分配利润变动，具体调了多少元？",
+      "ground_truth": "0 元",
+      "source_files": [
+        "山东药玻：2025年年度报告.pdf"
+      ],
+      "source_pages": [
+        164
+      ],
+      "scene": "factual",
+      "difficulty": "easy",
+      "metadata": {
+        "report_scope": "unspecified",
+        "generalization_excluded": true
+      }
+    },
+    {
+      "id": "s010",
+      "question": "我想知道指南针2025年年度报告第169页‘存出保证金·资产合计’那三栏具体列出的金额各是多少，能帮我查一下吗？",
+      "ground_truth": "存出保证金 1,169,570.00；资产合计三栏金额分别为 7,624,759,028.00、95,412,766.00、929,973,465.00",
+      "source_files": [
+        "指南针：2025年年度报告.pdf"
+      ],
+      "source_pages": [
+        169
+      ],
+      "scene": "extraction",
+      "difficulty": "easy",
+      "metadata": {
+        "report_scope": "unspecified",
+        "generalization_excluded": true
+      }
+    },
+    {
+      "id": "s011",
+      "question": "指南针2025年年报里，金融负债到年底还剩多少钱？",
+      "ground_truth": "10,847,327,682",
+      "source_files": [
+        "指南针：2025年年度报告.pdf"
+      ],
+      "source_pages": [
+        172
+      ],
+      "scene": "factual",
+      "difficulty": "easy",
+      "metadata": {
+        "report_scope": "unspecified",
+        "generalization_excluded": true
+      }
+    },
+    {
+      "id": "s012",
+      "question": "在指南针2025年年报第111页提到，如果金融工具没有活跃市场，公司会优先依据哪类输入值来选定估值技术？",
+      "ground_truth": "相关可观察输入值",
+      "source_files": [
+        "指南针：2025年年度报告.pdf"
+      ],
+      "source_pages": [
+        111
+      ],
+      "scene": "factual",
+      "difficulty": "easy",
+      "metadata": {
+        "report_scope": "unspecified",
+        "generalization_excluded": true
+      }
+    },
+    {
+      "id": "s013",
+      "question": "我想查一下，2025年年报里披露的公司在期末持有的那部分国债期货，在资产负债表上被当作衍生金融资产抵销列示的金额到底有多少元？",
+      "ground_truth": "0",
+      "source_files": [
+        "指南针：2025年年度报告.pdf"
+      ],
+      "source_pages": [
+        130
+      ],
+      "scene": "extraction",
+      "difficulty": "medium",
+      "metadata": {
+        "report_scope": "unspecified",
+        "generalization_excluded": true
+      }
+    },
+    {
+      "id": "s014",
+      "question": "我在看指南针2025年报第42页的派息方案，公司打算按每10股派0.8元（含税）分红，当时总股本609,791,915股，想确认一下这次总共要发多少含税现金红利？",
+      "ground_truth": "48,783,353.20元",
+      "source_files": [
+        "指南针：2025年年度报告.pdf"
+      ],
+      "source_pages": [
+        42
+      ],
+      "scene": "factual",
+      "difficulty": "easy",
+      "metadata": {
+        "report_scope": "unspecified",
+        "generalization_excluded": true
+      }
+    },
+    {
+      "id": "s015",
+      "question": "我在看指南针2025年年报，翻到第160页那个标注‘单位：元·合计’的项目，想知道它今年和去年各记了多少元？",
+      "ground_truth": "今年（本期）记了1,041,639,865.00元，去年（上期）记了669,857,311.00元。",
+      "source_files": [
+        "指南针：2025年年度报告.pdf"
+      ],
+      "source_pages": [
+        160
+      ],
+      "scene": "factual",
+      "difficulty": "easy",
+      "metadata": {
+        "report_scope": "unspecified",
+        "generalization_excluded": true
+      }
+    },
+    {
+      "id": "s016",
+      "question": "2025年末，应收清算款余额具体是多少？它和应收账款加上合同资产的期末合计金额相比，占比能到多少？",
+      "ground_truth": "195,071,714.00；96.27%",
+      "source_files": [
+        "指南针：2025年年度报告.pdf"
+      ],
+      "source_pages": [
+        132
+      ],
+      "scene": "factual",
+      "difficulty": "easy",
+      "metadata": {
+        "report_scope": "unspecified",
+        "generalization_excluded": true
+      }
+    },
+    {
+      "id": "s017",
+      "question": "我想确认一下，联科科技2025年报第158页列出的2024年所有者权益变动表里，‘资本公积’第一次出现时所对应的列名是什么？",
+      "ground_truth": "资本公积",
+      "source_files": [
+        "联科科技：2025年年度报告.pdf"
+      ],
+      "source_pages": [
+        158
+      ],
+      "scene": "factual",
+      "difficulty": "easy",
+      "metadata": {
+        "report_scope": "unspecified",
+        "generalization_excluded": true
+      }
+    },
+    {
+      "id": "s018",
+      "question": "联科科技2025年报里，应收账款坏账准备本期到底计提了多少元？",
+      "ground_truth": "1,741,195.18",
+      "source_files": [
+        "联科科技：2025年年度报告.pdf"
+      ],
+      "source_pages": [
+        196
+      ],
+      "scene": "factual",
+      "difficulty": "easy",
+      "metadata": {
+        "report_scope": "unspecified",
+        "generalization_excluded": true
+      }
+    },
+    {
+      "id": "s019",
+      "question": "山东联科在2025年因为供应商融资安排，把原来的应付账款转成短期借款，具体转了多少金额？",
+      "ground_truth": "304,330,226.00元",
+      "source_files": [
+        "联科科技：2025年年度报告.pdf"
+      ],
+      "source_pages": [
+        247
+      ],
+      "scene": "extraction",
+      "difficulty": "easy",
+      "metadata": {
+        "report_scope": "unspecified",
+        "generalization_excluded": true
+      }
+    },
+    {
+      "id": "s020",
+      "question": "想了解一下，本期报表里纯碱售价出现下滑，主要受哪些因素拖累？",
+      "ground_truth": "下游需求不振，以及天然碱厂商产能集中释放导致市场供应过剩",
+      "source_files": [
+        "联科科技：2025年年度报告.pdf"
+      ],
+      "source_pages": [
+        10
+      ],
+      "scene": "extraction",
+      "difficulty": "easy",
+      "metadata": {
+        "report_scope": "unspecified",
+        "generalization_excluded": true
+      }
+    },
+    {
+      "id": "s021",
+      "question": "芯导科技2025年年度报告中，关于“本期实际核销的应收款项融资情况”及其明细、核销说明、增减变动及公允价值变动情况，公司披露的结论分别是什么？",
+      "ground_truth": "均为“□适用 √不适用”，即公司披露结论为不适用。",
+      "source_files": [
+        "芯导科技：2025年年度报告.pdf"
+      ],
+      "source_pages": [
+        152
+      ],
+      "scene": "extraction",
+      "difficulty": "easy",
+      "metadata": {
+        "report_scope": "unspecified",
+        "generalization_excluded": true
+      }
+    },
+    {
+      "id": "s022",
+      "question": "在芯导科技最新公布的2025年度报告里，北京光电融合产业投资基金的期末账面价值具体是多少元？",
+      "ground_truth": "47,702,730.29元",
+      "source_files": [
+        "芯导科技：2025年年度报告.pdf"
+      ],
+      "source_pages": [
+        215
+      ],
+      "scene": "factual",
+      "difficulty": "easy",
+      "metadata": {
+        "report_scope": "unspecified",
+        "generalization_excluded": true
+      }
+    },
+    {
+      "id": "s023",
+      "question": "芯导科技2025年度母公司所有者权益变动表里，‘股份支付计入所有者权益的金额’这一栏具体是多少元？它让资本公积发生了怎样的增减变化？",
+      "ground_truth": "-5,624,006.96元，使资本公积减少5,624,006.96元",
+      "source_files": [
+        "芯导科技：2025年年度报告.pdf"
+      ],
+      "source_pages": [
+        115
+      ],
+      "scene": "factual",
+      "difficulty": "easy"
+    },
+    {
+      "id": "s024",
+      "question": "芯导科技在2025年度，把多少金额的自筹资金（已经花在募投项目上的）用募集资金给置换出来了？具体是多少元？",
+      "ground_truth": "16,991,118.24元",
+      "source_files": [
+        "芯导科技：2025年年度报告.pdf"
+      ],
+      "source_pages": [
+        86
+      ],
+      "scene": "factual",
+      "difficulty": "easy",
+      "metadata": {
+        "report_scope": "unspecified",
+        "generalization_excluded": true
+      }
+    },
+    {
+      "id": "s025",
+      "question": "在2025年年报里，芯导科技把投资活动现金流量中‘单项金额超过资产总额百分之几’视为重大项？",
+      "ground_truth": "5%",
+      "source_files": [
+        "芯导科技：2025年年度报告.pdf"
+      ],
+      "source_pages": [
+        121
+      ],
+      "scene": "factual",
+      "difficulty": "easy",
+      "metadata": {
+        "report_scope": "unspecified",
+        "generalization_excluded": true
+      }
+    },
+    {
+      "id": "s026",
+      "question": "芯导科技在2025年年报里提到已经失去对某家子公司的控制权，请教一下：合并报表中剩下的那部分股权要按照什么规则来定公允价值？同时，哪些差额会被直接算进今年的投资收益？",
+      "ground_truth": "剩余股权应按照“丧失控制权日的公允价值”重新计量；计入当期投资收益的差额为：处置股权取得的对价与剩余股权公允价值之和，减去按原持股比例计算应享有原有子公司自购买日开始持续计算的净资产份额后的差额。",
+      "source_files": [
+        "芯导科技：2025年年度报告.pdf"
+      ],
+      "source_pages": [
+        122
+      ],
+      "scene": "policy_qa",
+      "difficulty": "medium"
+    },
+    {
+      "id": "s027",
+      "question": "芯导科技2025年年报里，给董事、高管和核心技术人员那部分用权益结算的股份支付，一共花了多少钱？",
+      "ground_truth": "-1,001,521.88",
+      "source_files": [
+        "芯导科技：2025年年度报告.pdf"
+      ],
+      "source_pages": [
+        205
+      ],
+      "scene": "factual",
+      "difficulty": "easy",
+      "metadata": {
+        "report_scope": "unspecified",
+        "generalization_excluded": true
+      }
+    },
+    {
+      "id": "s028",
+      "question": "我在看陕国投Ａ 2025 年年报第 122 页时注意到，之前已经用权益法核算、账面还挂着其他综合收益的那部分股权，如果后面把这部分投资卖掉，报表上应该怎么处理？是把其他综合收益一起转进当期损益，还是有别的做法？",
+      "ground_truth": "在处置该部分投资时，原权益法核算确认的其他综合收益不转入当期损益，而是“采用与被投资单位直接处置相关资产或负债相同的基础进行会计处理”。",
+      "source_files": [
+        "陕国投Ａ：2025年年度报告.pdf"
+      ],
+      "source_pages": [
+        122
+      ],
+      "scene": "policy_qa",
+      "difficulty": "medium",
+      "metadata": {
+        "report_scope": "unspecified",
+        "generalization_excluded": true
+      }
+    },
+    {
+      "id": "s029",
+      "question": "2025年11月22日公告里，陕国投A这次定向增发A股拿到的批文是哪家监管机构盖的章？",
+      "ground_truth": "国家金融监督管理总局陕西监管局",
+      "source_files": [
+        "陕国投Ａ：2025年年度报告.pdf"
+      ],
+      "source_pages": [
+        63
+      ],
+      "scene": "factual",
+      "difficulty": "easy",
+      "metadata": {
+        "report_scope": "unspecified",
+        "generalization_excluded": true
+      }
+    },
+    {
+      "id": "s030",
+      "question": "在报告期末，陕国投Ａ账龄超过一年、因“尚未满足结算条件”而未结转的重要预收股权转让款，具体金额是多少？",
+      "ground_truth": "3,894,360.00",
+      "source_files": [
+        "陕国投Ａ：2025年年度报告.pdf"
+      ],
+      "source_pages": [
+        150
+      ],
+      "scene": "factual",
+      "difficulty": "easy",
+      "metadata": {
+        "report_scope": "unspecified",
+        "generalization_excluded": true
+      }
+    },
+    {
+      "id": "s031",
+      "question": "在最新报告期里，陕国投Ａ为了完善内部控制体系，一共新订或修订并下发了多少项制度？能随机告诉我其中任意四项制度的具体名称吗？",
+      "ground_truth": "91项；《公司章程》《股东会议事规则》《董事会议事规则》《董事会审计委员会议事规则》",
+      "source_files": [
+        "陕国投Ａ：2025年年度报告.pdf"
+      ],
+      "source_pages": [
+        57
+      ],
+      "scene": "extraction",
+      "difficulty": "easy",
+      "metadata": {
+        "report_scope": "unspecified",
+        "generalization_excluded": true
+      }
+    }
+  ]
+}
