@@ -39,7 +39,15 @@ LLM(Kimi/Qwen) ← 答案生成 ← 精排(bge-reranker) ← 向量检索(Top-30
 - 精排：BGE Reranker-v2-m3 交叉编码器 → Top-7 最终结果
 - 懒加载模型，禁用时不占显存
 
-### 3. 场景化生成策略（动态路由）
+#  3. SDG Hub — Synthetic QA 生成器
+
+- **解决 Ragas 痛点**：本方案采用 **Block-Flow-Contract** 架构解决存在Ragas generate流程黑盒、领域适配困难、成本不可控等问题。
+
+- **Ground Truth 与检索单元对齐**：生成器从 DocStore 读 chunk 而非原始 PDF，确保评估数据的 ground truth context 与检索索引单元严格一致。
+
+- **可持续评估闭环、成本可控**：pipeline 与 Hybrid Search 的 chunk 粒度完全对齐，可一键重新生成评估数据集，形成持续迭代闭环；单次生成 50 条问答成本控制在 **¥1 以内**。
+
+### 4. 场景化生成策略（动态路由）
 
 对问题处理等级进行路由：
 
