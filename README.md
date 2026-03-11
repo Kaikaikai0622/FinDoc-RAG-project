@@ -39,7 +39,7 @@ LLM(Kimi/Qwen) ← 答案生成 ← 精排(bge-reranker) ← 向量检索(Top-30
 - 精排：BGE Reranker-v2-m3 交叉编码器 → Top-7 最终结果
 - 懒加载模型，禁用时不占显存
 
-#  3. SDG Hub — Synthetic QA 生成器
+###  3. SDG Hub — Synthetic QA 生成器
 
 - **解决 Ragas 痛点**：本方案采用 **Block-Flow-Contract** 架构解决存在Ragas generate流程黑盒、领域适配困难、成本不可控等问题。
 
