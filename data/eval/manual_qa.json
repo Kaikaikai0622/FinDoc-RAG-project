@@ -225,6 +225,52 @@
       "source_pages": [189],
       "scene": "policy_qa",
       "difficulty": "hard"
-    }
+    },
+      {
+      "id": "m026",
+      "question": "联科科技的无形资产中，专利权和非专利技术的账面原值谁多谁少？差多少？",
+      "ground_truth": "2025 年度，联科科技的无形资产情况中，非专利技术的账面原值较多。专利权的账面原值期末余额为48,543.69元，非专利技术的账面原值期末余额为2,933,587.50，非专利技术的账面原值比专利权多2,885,043.81元。",
+      "source_files": ["联科科技：2025年年度报告.pdf"],
+      "source_pages": [220],
+      "scene": "comparison",
+      "difficulty": "medium"
+    },
+      {
+      "id": "m027",
+      "question": "中兴通讯的财务指标中，近三年的经营活动产生的现金流量净额是怎么样的变化趋势，哪一年最多那一年最少？",
+      "ground_truth": "2025 年度，中兴通讯经营活动产生的现金流量净额为 3,918.7 ，上年为11,479.8，同比增减为 65.86%，23年为17,405.7（单位：百万元），呈现下降趋势。",
+      "source_files": ["中兴通讯：2025年年度报告.pdf"],
+      "source_pages": [11],
+      "scene": "comparison",
+      "difficulty": "medium"
+    },
+      {
+      "id": "m028",
+      "question": "山东药玻的成本分析表中，模制瓶系列中的直接人工成本和制造费用成本哪个更高？两者的差额是多少？占据总成本比例的差距？",
+      "ground_truth": "山东药玻成本分析表中，分产品情况中，模制瓶系列的直接人工成本本期金额为 183,358,354.92 元，制造费用本期金额为 125,133,407.33 元。直接人工成本较制造费用更高，差额为 58,224,947.59 元，本期占总成本比例差距为 1.96%。",
+      "source_files": ["山东药玻：2025年年度报告.pdf"],
+      "source_pages": [27],
+      "scene": "comparison",
+      "difficulty": "hard"
+    },
+    {
+    "id": "m029",
+    "question": "芯导科技公司的创始人是谁？他毕业于哪所大学？孩子多大了？",
+    "ground_truth": "__UNANSWERABLE__",
+    "source_files": ["芯导科技：2025年年度报告.pdf"],
+    "source_pages": [0],
+    "scene": "out_of_scope",
+    "difficulty": "medium"
+  },
+    {
+    "id": "m030",
+    "question": "中兴通讯在2020年第一季度的营收预测是多少？",
+    "ground_truth": "__UNANSWERABLE__",
+    "source_files": ["中兴通讯：2025年年度报告.pdf"],
+    "source_pages": [0],
+    "scene": "out_of_scope",
+    "difficulty": "easy"
+  }
+
   ]
 }
