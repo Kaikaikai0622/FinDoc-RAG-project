@@ -53,7 +53,7 @@ LLM(Kimi/Qwen) ← 答案生成 ← 精排(bge-reranker) ← 向量检索(Top-30
 
 - **两步生成**：政策条款类问题 → Step1 纯抽取原文 → Step2 生成结论（保证 grounding）
 - **单步生成**：事实类问题直接回答（省 token）
-- 启发式判断问题类型，正则匹配 policy/extraction 关键词自动切换
+- **启发式判断问题类型**：正则匹配 policy/extraction 关键词自动切换
 
 ---
 
@@ -138,13 +138,18 @@ RAG_1/
 │   ├── api/           # FastAPI 接口
 │   ├── ingestion/     # 文档解析 + 切块
 │   ├── embedding/     # bge-m3 向量化
-│   ├── storage/      # ChromaDB + SQLite
-│   ├── retrieval/    # 检索 + Reranker
-│   ├── generation/   # QA Chain + LLM
-│   └── evaluation/   # Ragas 评估
+│   ├── storage/       # ChromaDB + SQLite
+│   ├── retrieval/     # 检索 + Reranker
+│   ├── generation/    # QA Chain + LLM
+│   └── evaluation/    # Ragas 评估
 ├── scripts/           # 入口脚本
+├── tests/             # 测试套件（四层金字塔）
+│   ├── unit/          # 单元测试
+│   ├── smoke/         # 组件/冒烟测试
+│   ├── integration/   # 集成测试
+│   └── e2e/           # 端到端测试
 ├── config/            # 配置参数
-└── data/             # 数据目录
+└── data/              # 数据目录
 ```
 
 ---
@@ -158,6 +163,48 @@ python scripts/evaluate.py --mode generate --num 50
 # 运行评估
 python scripts/evaluate.py --mode manual   # 手工评估
 python scripts/evaluate.py --mode full     # 完整评估
+```
+
+## 测试体系
+
+采用四层测试金字塔模型：
+
+```
+┌─────────────────────────────────────────┐
+│  E2E Tests (端到端测试)                  │  tests/e2e/
+│  - 完整用户场景验证                      │
+├─────────────────────────────────────────┤
+│  Integration Tests (集成测试)            │  tests/integration/
+│  - 多组件协作 + 真实数据库交互            │
+├─────────────────────────────────────────┤
+│  Component Tests (组件/冒烟测试)         │  tests/smoke/
+│  - 单组件完整功能验证                    │
+├─────────────────────────────────────────┤
+│  Unit Tests (单元测试)                   │  tests/unit/
+│  - 函数/类级别测试                       │
+└─────────────────────────────────────────┘
+```
+
+### 运行测试
+
+```bash
+# 运行全部测试
+pytest tests/ -v
+
+# 运行特定层级
+pytest tests/unit -v
+pytest tests/smoke -v
+pytest tests/integration -v -m "not slow"
+pytest tests/e2e -v
+
+# 运行特定测试文件
+pytest tests/integration/test_qa_pipeline.py -v
+
+# 运行特定测试用例
+pytest tests/integration/test_qa_pipeline.py::TestQAPipeline::test_two_step_generation -v
+
+# 覆盖率报告
+pytest tests/unit tests/integration --cov=src --cov-report=html
 ```
 
 ---

@@ -18,6 +18,8 @@
 
 ## Key Commands
 
+### 核心操作
+
 ```bash
 # 启动 API 服务
 uvicorn src.api.main:app --reload
@@ -40,11 +42,26 @@ python scripts/evaluate.py --mode full
 
 # 导出 chunks（人工核查）
 python scripts/export_chunks.py --file "陕国投" --output data/eval/chunks_verify.txt
+```
 
-# 冒烟测试
-python tests/test_chunker_fixes.py
-python tests/test_embedding.py
-python -m pytest tests/ -v
+### 测试命令（四层金字塔）
+
+```bash
+# 运行全部测试
+pytest tests/ -v
+
+# 分层运行
+pytest tests/unit -v              # 单元测试（~15秒）
+pytest tests/smoke -v             # 冒烟测试（~1分钟）
+pytest tests/integration -v       # 集成测试（~10分钟，真实数据库交互）
+pytest tests/e2e -v               # 端到端测试
+
+# 运行特定测试文件/用例
+pytest tests/integration/test_qa_pipeline.py -v
+pytest tests/integration/test_qa_pipeline.py::TestQAPipeline::test_two_step_generation -v
+
+# 覆盖率报告
+pytest tests/unit tests/integration --cov=src --cov-report=html
 ```
 
 ## Environment Variables (`.env`)
@@ -65,6 +82,14 @@ data/
     ├── manual_qa.json       # 手工标注 QA
     ├── synthetic_qa.json    # LLM 生成 QA
     └── experiments/         # 参数扫描结果
+
+tests/                          # 测试套件（四层金字塔）
+├── unit/                       # 单元测试
+├── smoke/                      # 组件/冒烟测试
+├── integration/                # 集成测试（多组件协作 + 真实数据库）
+│   ├── conftest.py             # 共享 Fixtures
+│   └── fixtures/               # 测试数据目录
+└── e2e/                        # 端到端测试
 ```
 
 ## 延伸文档
@@ -73,8 +98,11 @@ data/
 
 | 文档 | 内容 |
 |------|------|
+| `ARCHITECTURE.md` | 完整项目结构、目录说明 |
 | `agent_docs/architecture.md` | 完整数据流、模块职责表、支持格式 |
 | `agent_docs/ingestion.md` | PDF 解析（跨页合并、列名提取）、Chunker 三阶段逻辑、TableSummary 规则 |
 | `agent_docs/retrieval-generation.md` | 两阶段检索配置、Prompt 强制规则、LLM 切换方式 |
 | `agent_docs/evaluation.md` | Evaluator 指标体系、5-Block Flow、QA Schema v1.1 |
 | `agent_docs/testing-guide.md` | 冒烟测试、评估测试、chunk 质量验证清单 |
+| `tests/README.md` | 测试套件完整指南（四层金字塔、Fixtures、执行命令） |
+| `tests/IMPLEMENTATION_SUMMARY.md` | 集成测试实施总结 |

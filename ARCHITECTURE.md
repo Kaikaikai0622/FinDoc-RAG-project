@@ -59,11 +59,29 @@ RAG_1/
 │       ├── synthetic_qa.json   # LLM 生成 QA
 │       ├── experiments/        # 参数扫描结果
 │       └── reports/            # 评估报告
-└── tests/
-    ├── test_chunker_fixes.py   # Chunker 冒烟测试（TableSummary + 跨页政策段落）
-    ├── test_embedding.py       # Embedding 冒烟测试（首次运行下载 ~2.2GB 模型）
-    ├── test_document_router.py # DocumentRouter 多格式路由单元测试
-    ├── test_reranker.py        # Reranker 单元测试
-    ├── test_defensive_check.py # 防御性检查测试
-    ├── test_ragas_cols.py      # Ragas 指标列名兼容性测试
-    └── check_imports.py        # 依赖导入健康检查
+└── tests/                          # 测试套件（四层测试金字塔）
+    ├── unit/                       # 单元测试（函数/类级别，大量使用 Mock）
+    │   ├── test_document_router.py # DocumentRouter 多格式路由测试
+    │   └── check_imports.py        # 依赖导入健康检查
+    ├── smoke/                      # 组件/冒烟测试（单组件完整功能）
+    │   ├── test_chunker_fixes.py   # Chunker 冒烟测试（TableSummary + 跨页政策段落）
+    │   ├── test_embedding.py       # Embedding 冒烟测试（首次运行下载 ~2.2GB 模型）
+    │   ├── test_reranker.py        # Reranker 单元测试
+    │   ├── test_company_resolver.py # 公司名称解析测试
+    │   ├── test_comparison_two_step.py # 两步生成策略测试
+    │   ├── test_filter_file.py     # 文件过滤功能测试
+    │   ├── test_defensive_check.py # 防御性检查测试
+    │   └── test_ragas_cols.py      # Ragas 指标列名兼容性测试
+    ├── integration/                # 集成测试（多组件协作 + 真实数据库交互）
+    │   ├── conftest.py             # 共享 Fixtures（隔离存储、Mock LLM、预填充数据）
+    │   ├── test_ingestion_pipeline.py   # Ingestion Pipeline（PDF→Chunk→Embedding→存储）
+    │   ├── test_retrieval_pipeline.py   # Retrieval Pipeline（Query→检索→SQLite Join）
+    │   ├── test_qa_pipeline.py          # QA Pipeline（Question→检索→LLM Generation）
+    │   ├── test_evaluation_pipeline.py  # Evaluation Pipeline（QA对→评估→报告）
+    │   ├── test_api.py                  # API 集成测试（FastAPI TestClient）
+    │   └── fixtures/                    # 测试数据目录
+    │       ├── sample_pdfs/             # PDF 样本文件
+    │       ├── sample_qa/               # 测试 QA 数据集
+    │       └── expected_outputs/        # 预期输出
+    └── e2e/                        # 端到端测试（完整用户场景）
+        └── test_complete_workflow.py    # 完整工作流：Ingest→Retrieval→QA
