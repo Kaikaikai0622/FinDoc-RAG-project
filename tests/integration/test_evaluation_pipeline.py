@@ -36,7 +36,7 @@ class TestEvaluationPipeline:
         """
         from src.evaluation.evaluator import Evaluator
 
-        evaluator = Evaluator()
+        _ = Evaluator()  # noqa: F841 - 验证初始化成功
         qa_path = Path("data/eval/manual_qa.json")
 
         if not qa_path.exists():
@@ -58,7 +58,7 @@ class TestEvaluationPipeline:
         """
         from src.evaluation.evaluator import Evaluator
 
-        evaluator = Evaluator()
+        _ = Evaluator()  # noqa: F841 - 验证初始化成功
         qa_path = Path("data/eval/synthetic_qa.json")
 
         if not qa_path.exists():
@@ -134,22 +134,8 @@ class TestEvaluationPipeline:
 
         场景: 对一个QA对进行评估
         """
-        from src.evaluation.evaluator import Evaluator
-        from src.generation.qa_chain import QAChain
-
-        evaluator = Evaluator()
-        qa_chain = QAChain()
-
-        # 定义一个测试QA对
-        test_qa = {
-            "question": "营收是多少？",
-            "answer": "公司2025年营收为100亿元",
-            "ground_truth": "100亿元",
-        }
-
-        # 进行评估（需要LLM）
-        # result = evaluator.evaluate_single(qa_chain, test_qa)
-        # assert "score" in result
+        from src.evaluation.evaluator import Evaluator  # noqa: F401
+        from src.generation.qa_chain import QAChain  # noqa: F401
 
     def test_evaluator_modes(self):
         """
@@ -159,7 +145,7 @@ class TestEvaluationPipeline:
         """
         from src.evaluation.evaluator import Evaluator
 
-        evaluator = Evaluator()
+        _ = Evaluator()  # noqa: F841 - 验证初始化成功
 
         # 验证评估器支持的模式
         # 这些模式在scripts/evaluate.py中被使用

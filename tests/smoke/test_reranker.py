@@ -5,7 +5,6 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 
 from src.retrieval.reranker import BGERerankerV2M3
-from src.retrieval.rerank_retriever import RerankRetriever
 
 # ── 1. 单独测试 reranker ──────────────────────────────────────────────────
 print("=" * 60)

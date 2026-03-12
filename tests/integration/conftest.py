@@ -3,7 +3,6 @@
 为集成测试提供隔离的存储环境、Mock服务和样本数据。
 """
 import pytest
-import tempfile
 import shutil
 from pathlib import Path
 from unittest.mock import MagicMock

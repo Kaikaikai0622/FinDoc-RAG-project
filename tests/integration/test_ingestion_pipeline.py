@@ -9,7 +9,6 @@
 - 批量文件摄取
 - 错误处理
 """
-import pytest
 from src.ingestion.pipeline import IngestionPipeline
 from src.storage import DocStore, VectorStore
 

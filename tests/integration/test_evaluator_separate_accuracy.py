@@ -8,8 +8,7 @@ sys.stdout = open(sys.stdout.fileno(), mode='w', encoding='utf-8', buffering=1)
 # 添加项目根目录到路径
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from src.evaluation.evaluator import Evaluator, EvalResult
-from src.evaluation.dataset import EvalDataset
+from src.evaluation.evaluator import EvalResult
 
 PASS = "\033[32mPASS\033[0m"
 FAIL = "\033[31mFAIL\033[0m"
@@ -229,7 +228,7 @@ print()
 # ─────────────────────────────────────────────────────────────
 print("=" * 60)
 if errors == 0:
-    print(f"\033[32m✅ 所有冒烟测试通过（0 failures）\033[0m")
+    print("\033[32m✅ 所有冒烟测试通过（0 failures）\033[0m")
 else:
     print(f"\033[31m❌ {errors} 个测试失败\033[0m")
 print("=" * 60)

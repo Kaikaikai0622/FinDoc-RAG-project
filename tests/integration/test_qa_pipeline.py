@@ -9,7 +9,6 @@
 - 空检索结果处理
 - 单步vs两步生成策略
 """
-import pytest
 from src.generation.qa_chain import QAChain
 from src.retrieval import Retriever
 from unittest.mock import MagicMock

@@ -7,7 +7,6 @@
 - IngestionPipeline 向后兼容 pdf_path 关键字参数
 """
 import csv
-import tempfile
 from unittest.mock import patch, MagicMock
 
 import pytest

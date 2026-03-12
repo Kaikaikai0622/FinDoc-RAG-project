@@ -79,7 +79,7 @@ print(f"[{label_1b}] 1b. ★续表场景★ 首行是数据行→表头正确识
 if summary_with_total:
     print(f"       内容: {summary_with_total[0]}")
 else:
-    print(f"       ❌ 未找到含'负债和股东权益总计'的 summary chunk")
+    print("       ❌ 未找到含'负债和股东权益总计'的 summary chunk")
     print(f"       所有 chunks: {chunks_cont}")
 if not ok_1b:
     errors += 1
@@ -289,7 +289,7 @@ if not (ok_ts1 and ok_ts2 and ok_ts3 and ok_ts4):
 print()
 print("=" * 60)
 if errors == 0:
-    print(f"\033[32m✅ 所有冒烟测试通过（0 failures）\033[0m")
+    print("\033[32m✅ 所有冒烟测试通过（0 failures）\033[0m")
 else:
     print(f"\033[31m❌ {errors} 个测试失败\033[0m")
 print("=" * 60)
