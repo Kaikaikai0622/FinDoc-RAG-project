@@ -36,15 +36,24 @@ class EvalResult:
     config: dict
     total_questions: int
 
-    # 基础指标
+    # 基础指标（全部问题）
     accuracy: float
     retrieval_hit_rate: float
     avg_retrieval_rank: float
 
-    # 场景权重修正后的准确率
-    # 按本次评估集的实际场景分布加权（而非固定理想分布），消除 synthetic QA 场景比例随机的影响
+    # 场景权重修正后的准确率（仅 synthetic 问题，基于 synthetic 自身场景分布）
+    # manual 问题不计算加权准确率
     # 参考理想权重（不参与计算，仅供对比）: factual=35%, extraction=35%, policy_qa=20%, comparison=10%
     weighted_accuracy: float = 0.0
+
+    # Synthetic 问题独立指标（决策2：synthetic 准确率分离计算）
+    synthetic_accuracy: float = 0.0           # synthetic 子集初始准确率
+    synthetic_weighted_accuracy: float = 0.0  # synthetic 子集加权准确率
+    synthetic_count: int = 0                  # synthetic 问题数量
+
+    # Manual 问题独立指标
+    manual_accuracy: float = 0.0              # manual 子集准确率（无加权）
+    manual_count: int = 0                     # manual 问题数量
 
     # Ragas 指标
     faithfulness: float = 0.0
@@ -141,6 +150,13 @@ class Evaluator:
         model_answers = []
         contexts = []
 
+        # 决策2：分离 manual 和 synthetic 问题的统计
+        manual_correct = 0
+        manual_count = 0
+        synthetic_correct = 0
+        synthetic_count = 0
+        synthetic_details = []  # 仅 synthetic 问题的 details 用于加权计算
+
         for i, qa in enumerate(qa_pairs):
             question = qa["question"]
             ground_truth = qa["ground_truth"]
@@ -181,34 +197,74 @@ class Evaluator:
                     contexts.append([chunk.get("chunk_text", "") for chunk in retrieved_chunks])
 
                 # 统计基础指标
-                if basic_metrics["answer_correct"]:
+                is_correct = basic_metrics["answer_correct"]
+                if is_correct:
                     correct_count += 1
                 if basic_metrics["retrieval_hit"]:
                     hit_count += 1
                     rank_sum += basic_metrics["retrieval_rank"]
                     hit_count_for_avg += 1
 
+                # 决策2：识别问题来源并分别统计
+                qid = qa.get("id", f"q{i+1}")
+                is_manual = qid.startswith("m")  # manual 问题 ID 以 m 开头
+                is_synthetic = not is_manual     # synthetic 问题 ID 以 s 开头或数字开头
+
+                if is_manual:
+                    manual_count += 1
+                    if is_correct:
+                        manual_correct += 1
+                else:
+                    synthetic_count += 1
+                    if is_correct:
+                        synthetic_correct += 1
+                    # 收集 synthetic 问题的详情用于后续加权计算
+                    synthetic_details.append({
+                        "id": qid,
+                        "scene": scene,
+                        "answer_correct": is_correct,
+                    })
+
                 # 记录详情
                 details.append({
-                    "id": qa.get("id", f"q{i+1}"),
+                    "id": qid,
                     "question": question,
                     "ground_truth": ground_truth,
                     "model_answer": model_answer,
                     "scene": scene,
                     "difficulty": difficulty,
+                    "is_manual": is_manual,
+                    "is_synthetic": is_synthetic,
                     "sources": retrieved_sources,
                     **basic_metrics,
                 })
 
             except Exception as e:
                 logger.error(f"评估问题 {question[:30]}... 时出错: {e}")
+                qid = qa.get("id", f"q{i+1}")
+                is_manual = qid.startswith("m")
+                is_synthetic = not is_manual
+
+                # 错误时也统计到对应类型
+                if is_manual:
+                    manual_count += 1
+                else:
+                    synthetic_count += 1
+                    synthetic_details.append({
+                        "id": qid,
+                        "scene": scene,
+                        "answer_correct": False,
+                    })
+
                 details.append({
-                    "id": qa.get("id", f"q{i+1}"),
+                    "id": qid,
                     "question": question,
                     "ground_truth": ground_truth,
                     "model_answer": f"ERROR: {e}",
                     "scene": scene,
                     "difficulty": difficulty,
+                    "is_manual": is_manual,
+                    "is_synthetic": is_synthetic,
                     "answer_correct": False,
                     "retrieval_hit": False,
                     "retrieval_rank": -1,
@@ -249,7 +305,19 @@ class Evaluator:
         # 按场景分组统计
         scene_metrics = self._compute_scene_metrics(details)
 
-        # 计算加权准确率
+        # 决策2：计算 manual 和 synthetic 的独立指标
+        # manual 准确率（无加权）
+        manual_accuracy_val = manual_correct / manual_count if manual_count > 0 else 0.0
+
+        # synthetic 准确率
+        synthetic_accuracy_val = synthetic_correct / synthetic_count if synthetic_count > 0 else 0.0
+
+        # synthetic 加权准确率（仅基于 synthetic 自身场景分布）
+        synthetic_weighted_accuracy_val = self._compute_weighted_accuracy(
+            synthetic_details, synthetic_accuracy_val
+        ) if synthetic_count > 0 else 0.0
+
+        # 全局加权准确率（基于全部问题的场景分布，用于向后兼容）
         weighted_accuracy = self._compute_weighted_accuracy(details, accuracy)
 
         # 构建结果
@@ -261,13 +329,22 @@ class Evaluator:
             accuracy=accuracy,
             retrieval_hit_rate=retrieval_hit_rate,
             avg_retrieval_rank=avg_retrieval_rank,
+            # 加权准确率字段
+            weighted_accuracy=weighted_accuracy,
+            # Synthetic 独立指标
+            synthetic_accuracy=synthetic_accuracy_val,
+            synthetic_weighted_accuracy=synthetic_weighted_accuracy_val,
+            synthetic_count=synthetic_count,
+            # Manual 独立指标
+            manual_accuracy=manual_accuracy_val,
+            manual_count=manual_count,
+            # Ragas 指标
             faithfulness=ragas_metrics.get("faithfulness", 0.0),
             answer_relevancy=ragas_metrics.get("answer_relevancy", 0.0),
             context_precision=ragas_metrics.get("context_precision", 0.0),
             context_recall=ragas_metrics.get("context_recall", 0.0),
             scene_metrics=scene_metrics,
             details=details,
-            weighted_accuracy=weighted_accuracy,
         )
 
         logger.info(f"评估完成: accuracy={accuracy:.2%}, hit_rate={retrieval_hit_rate:.2%}")
@@ -827,12 +904,14 @@ if __name__ == "__main__":
     print("Evaluation Results")
     print("=" * 60)
     print(f"Total questions: {result.total_questions}")
-    print(f"Accuracy: {result.accuracy:.2%}")
+    print(f"Overall Accuracy: {result.accuracy:.2%}")
     print(f"Retrieval Hit Rate: {result.retrieval_hit_rate:.2%}")
     print(f"Avg Retrieval Rank: {result.avg_retrieval_rank:.1f}")
     print(f"Faithfulness: {result.faithfulness:.2%}")
     print(f"Answer Relevancy: {result.answer_relevancy:.2%}")
     print(f"Context Precision: {result.context_precision:.2%}")
     print(f"Context Recall: {result.context_recall:.2%}")
-    print(f"Weighted Accuracy: {result.weighted_accuracy:.2%}")
+    print("-" * 60)
+    print(f"Manual Questions: {result.manual_count} | Accuracy: {result.manual_accuracy:.2%}")
+    print(f"Synthetic Questions: {result.synthetic_count} | Accuracy: {result.synthetic_accuracy:.2%} | Weighted: {result.synthetic_weighted_accuracy:.2%}")
     print("=" * 60)
