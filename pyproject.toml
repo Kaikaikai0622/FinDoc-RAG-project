@@ -66,6 +66,9 @@ target-version = "py312"
 # E701 - 一行多个语句（冒烟测试中的简洁写法）
 "tests/smoke/*" = ["E402", "E701"]
 "tests/integration/test_evaluator_separate_accuracy.py" = ["E402"]
+# 脚本文件允许E402（因需要优先设置sys.path或加载环境变量）
+"scripts/*" = ["E402"]
+"cli.py" = ["E402"]
 
 [tool.mypy]
 python_version = "3.12"

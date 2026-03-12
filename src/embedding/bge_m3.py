@@ -63,7 +63,7 @@ class BGEm3EmbeddingService(BaseEmbeddingService):
             # 明确将模型移到GPU
             if self._device == "cuda":
                 self._model = self._model.to("cuda")
-                logger.info(f"[Embedding] 模型已加载到 GPU")
+                logger.info("[Embedding] 模型已加载到 GPU")
 
         return self._model
 

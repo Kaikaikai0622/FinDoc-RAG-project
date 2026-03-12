@@ -8,7 +8,7 @@
   - 跨页同结构表格自动合并为一个逻辑 chunk
 """
 from pathlib import Path
-from typing import List, Dict, Any, Optional
+from typing import List
 import logging
 import re
 
@@ -77,7 +77,7 @@ class PDFParser:
                 page_lines: List[str] = []
                 if text and text.strip():
                     section_title = self._extract_section_title(text)
-                    page_lines = [l for l in text.split("\n") if l.strip()]
+                    page_lines = [line for line in text.split("\n") if line.strip()]
 
                     results.append(ParsedElement(
                         text=text,
@@ -285,8 +285,8 @@ class PDFParser:
 
         # 找 continuation 中的分隔行（|---|）位置，跳过表头和分隔行，只取数据行
         sep_idx = next(
-            (i for i, l in enumerate(cont_lines)
-             if l.strip().startswith("|") and "---" in l),
+            (i for i, line in enumerate(cont_lines)
+             if line.strip().startswith("|") and "---" in line),
             None,
         )
         if sep_idx is not None:
@@ -297,7 +297,7 @@ class PDFParser:
             data_lines = cont_lines[1:] if len(cont_lines) > 1 else cont_lines
 
         # 过滤掉空行
-        data_lines = [l for l in data_lines if l.strip()]
+        data_lines = [line for line in data_lines if line.strip()]
 
         merged_text = "\n".join(base_lines + data_lines)
 

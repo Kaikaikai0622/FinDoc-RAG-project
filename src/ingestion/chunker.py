@@ -425,7 +425,7 @@ class Chunker:
                     )
                     lines = injected.split("\n")
                     sep_idx = next(
-                        (i for i, l in enumerate(lines) if l.startswith("|") and "---" in l),
+                        (i for i, line in enumerate(lines) if line.startswith("|") and "---" in line),
                         None,
                     )
                     if sep_idx is not None and sep_idx + 1 < len(lines):

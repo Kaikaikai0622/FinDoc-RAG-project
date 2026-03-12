@@ -6,10 +6,10 @@
 """
 import logging
 from pathlib import Path
-from typing import List, Optional, TYPE_CHECKING
+from typing import List, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    import openpyxl as _openpyxl_type
+    pass
 
 from .models import ParsedDocument, ParsedElement
 

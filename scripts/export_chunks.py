@@ -75,9 +75,9 @@ def export_chunks(
                                 if not matched_file:
                                     matched_file = source_file
                                 break
-                        except:
+                        except UnicodeDecodeError:
                             continue
-                except:
+                except Exception:
                     pass
 
         if matched_file:
@@ -87,7 +87,7 @@ def export_chunks(
             all_files = get_all_source_files()
             title = f"No match for '{file_filter}', total: {len(chunks)}"
             print(f"Warning: No file matched '{file_filter}'")
-            print(f"Files in database:")
+            print("Files in database:")
             for f in all_files:
                 print(f"     {repr(f)}")
     else:

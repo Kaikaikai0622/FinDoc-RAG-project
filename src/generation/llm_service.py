@@ -4,7 +4,6 @@
 """
 import os
 from abc import ABC, abstractmethod
-from typing import Optional
 from pathlib import Path
 
 # 加载 .env 文件
@@ -15,7 +14,7 @@ env_path = Path(__file__).parent.parent.parent / ".env"
 if env_path.exists():
     load_dotenv(env_path)
 
-from config import (
+from config import (  # noqa: E402
     LLM_PROVIDER,
     QWEN_MODEL,
     QWEN_BASE_URL,

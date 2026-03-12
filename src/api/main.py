@@ -1,7 +1,7 @@
 """FastAPI 问答接口"""
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-from typing import List, Dict, Any
+from typing import List
 
 from src.generation import QAChain
 from src.storage import DocStore
