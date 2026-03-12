@@ -30,18 +30,30 @@ class Retriever:
         self.vector_store = vector_store or VectorStore()
         self.doc_store = doc_store or DocStore()
 
-    def search(self, query: str, top_k: int | None = None) -> List[Dict[str, Any]]:
+    def search(
+        self,
+        query: str,
+        top_k: int | None = None,
+        filter_file: str | None = None,
+    ) -> List[Dict[str, Any]]:
         """检索与问题相关的文档片段
 
         Args:
             query: 用户问题
             top_k: 返回 top k 结果，默认从 settings.TOP_K 读取
+            filter_file: 按来源文件名过滤（支持部分匹配，如"陕国投"匹配"陕国投A：2025年年度报告.pdf"）
 
         Returns:
             相关文档片段列表，每项包含 chunk_id, chunk_text, source_file, page_number, score
         """
         if top_k is None:
             top_k = TOP_K
+
+        # 构建 ChromaDB where 过滤条件
+        where_filter = None
+        if filter_file:
+            # 使用 $contains 进行部分匹配
+            where_filter = {"source_file": {"$contains": filter_file}}
 
         # 1. 将问题向量化
         query_embedding = self.embedding_service.embed([query])[0]
@@ -50,6 +62,7 @@ class Retriever:
         vector_results = self.vector_store.query(
             embedding=query_embedding,
             top_k=top_k,
+            where=where_filter,
         )
 
         # 3. 从 SQLite 获取原文和元信息
@@ -72,15 +85,16 @@ class Retriever:
         return results
 
 
-def retrieve(query: str, top_k: int | None = None) -> List[Dict[str, Any]]:
+def retrieve(query: str, top_k: int | None = None, filter_file: str | None = None) -> List[Dict[str, Any]]:
     """便捷检索函数
 
     Args:
         query: 用户问题
         top_k: 返回 top k 结果
+        filter_file: 按来源文件名过滤
 
     Returns:
         相关文档片段列表
     """
     retriever = Retriever()
-    return retriever.search(query, top_k)
+    return retriever.search(query, top_k, filter_file)

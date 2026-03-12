@@ -21,6 +21,7 @@ qa_chain = QAChain()
 class QueryRequest(BaseModel):
     """问答请求"""
     question: str
+    filter_file: str | None = None  # 按来源文件名过滤（支持部分匹配）
 
 
 class SourceInfo(BaseModel):
@@ -64,7 +65,7 @@ def query(request: QueryRequest):
     """问答接口
 
     Args:
-        request: 问答请求，包含问题
+        request: 问答请求，包含问题和可选的过滤条件
 
     Returns:
         问答响应，包含答案和引用来源
@@ -73,7 +74,7 @@ def query(request: QueryRequest):
         raise HTTPException(status_code=400, detail="问题不能为空")
 
     try:
-        result = qa_chain.ask(request.question)
+        result = qa_chain.ask(request.question, filter_file=request.filter_file)
 
         # 转换 sources 格式
         sources = [

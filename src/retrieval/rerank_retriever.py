@@ -39,12 +39,14 @@ class RerankRetriever:
         self,
         query: str,
         top_k: int | None = None,
+        filter_file: str | None = None,
     ) -> list[dict[str, Any]]:
         """检索并精排相关文档片段。
 
         Args:
             query:  用户问题
             top_k:  精排最终返回数量，None 时使用 config.RERANK_TOP_K
+            filter_file: 按来源文件名过滤（支持部分匹配）
 
         Returns:
             精排后的文档列表，每项含 chunk_id、chunk_text、source_file、
@@ -53,7 +55,7 @@ class RerankRetriever:
         rerank_top_k = top_k if top_k is not None else RERANK_TOP_K
 
         # 第一阶段：粗检索，固定取 RETRIEVAL_TOP_K 条候选
-        candidates = self.retriever.search(query, top_k=RETRIEVAL_TOP_K)
+        candidates = self.retriever.search(query, top_k=RETRIEVAL_TOP_K, filter_file=filter_file)
         logger.debug("粗检索返回 %d 条候选", len(candidates))
 
         if not candidates:

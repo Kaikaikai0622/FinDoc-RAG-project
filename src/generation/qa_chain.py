@@ -15,6 +15,7 @@ from src.generation.prompts import (
     format_context,
 )
 from config import USE_RERANKER
+from src.utils.company_resolver import extract_company_filter
 
 # 触发两步重量级流程的场景关键词
 # 命中任意一个词 → 走 extraction + conclude 两次调用
@@ -75,20 +76,31 @@ class QAChain:
     # 公开接口
     # ──────────────────────────────────────────────
 
-    def ask(self, question: str) -> Dict[str, Any]:
+    def ask(self, question: str, filter_file: str | None = None) -> Dict[str, Any]:
         """执行问答
 
         Args:
             question: 用户问题
+            filter_file: 按来源文件名过滤（支持部分匹配，如"陕国投"）
+                         若为 None，自动从问题中提取公司名称
 
         Returns:
-            结构化结果，包含问题、答案、引用来源、检索耗时、生成耗时、mode
+            结构化结果，包含问题、答案、引用来源、检索耗时、生成耗时、mode、filter_used
         """
         total_start = time.time()
 
+        # 自动提取公司名称（如果未提供 filter_file）
+        auto_filter = None
+        if filter_file is None:
+            auto_filter = extract_company_filter(question)
+            if auto_filter:
+                print(f"[自动识别] 从问题中提取到公司: {auto_filter}")
+        else:
+            auto_filter = filter_file
+
         # 1. 检索相关段落
         retrieval_start = time.time()
-        chunks = self.retriever.search(question)
+        chunks = self.retriever.search(question, filter_file=auto_filter)
         retrieval_time = time.time() - retrieval_start
 
         # 2. 格式化上下文
@@ -125,6 +137,8 @@ class QAChain:
             "generation_time": round(generation_time, 3),
             "total_time": round(total_time, 3),
             "mode": mode,
+            "filter_used": auto_filter,  # 实际使用的过滤条件
+            "filter_auto": filter_file is None and auto_filter is not None,  # 是否自动提取
         }
 
     # ──────────────────────────────────────────────
@@ -170,14 +184,15 @@ class QAChain:
         return combined, "two_step"
 
 
-def ask(question: str) -> Dict[str, Any]:
+def ask(question: str, filter_file: str | None = None) -> Dict[str, Any]:
     """便捷问答函数
 
     Args:
         question: 用户问题
+        filter_file: 按来源文件名过滤
 
     Returns:
         问答结果
     """
     qa_chain = QAChain()
-    return qa_chain.ask(question)
+    return qa_chain.ask(question, filter_file=filter_file)
