@@ -37,15 +37,18 @@ class BGEm3EmbeddingService(BaseEmbeddingService):
         Returns:
             设备信息字符串
         """
-        if torch.cuda.is_available():
-            device_name = torch.cuda.get_device_name(0)
-            self._device = "cuda"
-            logger.info(f"[Embedding] 使用 GPU: {device_name}")
-            return f"cuda:0 ({device_name})"
-        else:
-            self._device = "cpu"
-            logger.warning("[Embedding] 未检测到 GPU，将使用 CPU")
-            return "cpu"
+        if torch.cuda.is_available() and torch.cuda.device_count() > 0:
+            try:
+                device_name = torch.cuda.get_device_name(0)
+                self._device = "cuda"
+                logger.info(f"[Embedding] 使用 GPU: {device_name}")
+                return f"cuda:0 ({device_name})"
+            except Exception as exc:
+                logger.warning("[Embedding] GPU 初始化失败，回退到 CPU: %s", exc)
+
+        self._device = "cpu"
+        logger.warning("[Embedding] 未检测到可用 GPU，将使用 CPU")
+        return "cpu"
 
     @property
     def model(self) -> SentenceTransformer:
@@ -59,10 +62,17 @@ class BGEm3EmbeddingService(BaseEmbeddingService):
             device_info = self._get_device_info()
             logger.info(f"[Embedding] 加载模型: {self.model_name}, 设备: {device_info}")
 
-            self._model = SentenceTransformer(self.model_name)
-            # 明确将模型移到GPU
+            try:
+                self._model = SentenceTransformer(self.model_name, device=self._device)
+            except Exception as exc:
+                if self._device == "cuda":
+                    logger.warning("[Embedding] GPU 加载失败，回退到 CPU: %s", exc)
+                    self._device = "cpu"
+                    self._model = SentenceTransformer(self.model_name, device="cpu")
+                else:
+                    raise
+
             if self._device == "cuda":
-                self._model = self._model.to("cuda")
                 logger.info("[Embedding] 模型已加载到 GPU")
 
         return self._model

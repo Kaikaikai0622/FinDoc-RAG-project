@@ -55,3 +55,11 @@ LOG_LEVEL = "INFO"
 # ========== 实验配置 ==========
 EXPERIMENT_CHUNK_SIZES = [256, 512, 1024]
 EXPERIMENT_TOP_KS = [3, 5, 10]
+
+# ========== Query Router 配置 ==========
+ENABLE_QUERY_ROUTER = True  # 总开关，False 时回退到旧逻辑
+QUERY_ROUTER_ALLOW_AUTO_FILTER_FALLBACK = True  # 自动识别公司时允许回退
+QUERY_ROUTER_ALLOW_EXPLICIT_FILTER_FALLBACK = False  # 显式 filter 默认不允许回退
+QUERY_ROUTER_EMPTY_RESULT_THRESHOLD = 0  # 结果数 <= 此值时触发回退（0 表示空结果才回退）
+QUERY_ROUTER_DEBUG = False  # 调试模式（额外日志输出）
+QUERY_ROUTER_CONFIDENCE_THRESHOLD = 0.6  # 分类置信度阈值（低于此值标记为低置信度）

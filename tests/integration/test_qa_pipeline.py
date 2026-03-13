@@ -9,6 +9,7 @@
 - 空检索结果处理
 - 单步vs两步生成策略
 """
+import pytest
 from src.generation.qa_chain import QAChain
 from src.retrieval import Retriever
 from unittest.mock import MagicMock
@@ -225,3 +226,116 @@ class TestQAPipeline:
         for question in test_cases:
             result = qa_chain_with_mock_llm.ask(question)
             assert result["mode"] == "two_step", f"问题'{question}'应该触发两步生成"
+
+
+class TestQAPipelineRouterFields:
+    """Router 字段验证测试（Phase 7 新增）"""
+
+    def test_qa_returns_router_fields_when_enabled(self, qa_chain_with_mock_llm):
+        """Router 启用时返回新增字段"""
+        from config import ENABLE_QUERY_ROUTER
+
+        if not ENABLE_QUERY_ROUTER:
+            pytest.skip("Router 未启用，跳过测试")
+
+        result = qa_chain_with_mock_llm.ask("陕国投A的营收是多少？")
+
+        # 验证 Router 字段存在
+        assert "route_label" in result
+        assert "retrieval_mode" in result
+        assert "fallback_triggered" in result
+        assert "query_classifier" in result
+        assert "retrieved_context" in result
+
+    def test_qa_retrieval_mode_filtered(self, qa_chain_with_mock_llm):
+        """识别公司名时走 filtered 模式"""
+        from config import ENABLE_QUERY_ROUTER
+
+        if not ENABLE_QUERY_ROUTER:
+            pytest.skip("Router 未启用，跳过测试")
+
+        result = qa_chain_with_mock_llm.ask("陕国投A的营收是多少？")
+
+        # 应使用过滤检索
+        assert result["retrieval_mode"] in ["filtered", "filtered_then_global"]
+
+    def test_qa_retrieval_mode_global(self, qa_chain_with_mock_llm):
+        """未识别公司名时走 global 模式"""
+        from config import ENABLE_QUERY_ROUTER
+
+        if not ENABLE_QUERY_ROUTER:
+            pytest.skip("Router 未启用，跳过测试")
+
+        # 使用不太可能匹配任何公司名的查询
+        result = qa_chain_with_mock_llm.ask("介绍一下公司的业务")
+
+        assert result["retrieval_mode"] == "global"
+
+    def test_qa_classifier_structure(self, qa_chain_with_mock_llm):
+        """query_classifier 结构完整"""
+        from config import ENABLE_QUERY_ROUTER
+
+        if not ENABLE_QUERY_ROUTER:
+            pytest.skip("Router 未启用，跳过测试")
+
+        result = qa_chain_with_mock_llm.ask("陕国投A的营收是多少？")
+
+        qc = result["query_classifier"]
+        assert "scene" in qc
+        assert "generation_mode" in qc
+        assert "filter_source" in qc
+        assert "retrieval_scope" in qc
+        assert "confidence" in qc
+
+    def test_qa_route_label_factual(self, qa_chain_with_mock_llm):
+        """factual 问题的 route_label"""
+        from config import ENABLE_QUERY_ROUTER
+
+        if not ENABLE_QUERY_ROUTER:
+            pytest.skip("Router 未启用，跳过测试")
+
+        result = qa_chain_with_mock_llm.ask("营收是多少？")
+        assert result["route_label"] == "factual"
+
+    def test_qa_route_label_comparison(self, qa_chain_with_mock_llm):
+        """comparison 问题的 route_label"""
+        from config import ENABLE_QUERY_ROUTER
+
+        if not ENABLE_QUERY_ROUTER:
+            pytest.skip("Router 未启用，跳过测试")
+
+        result = qa_chain_with_mock_llm.ask("与去年相比营收如何？")
+        assert result["route_label"] == "comparison"
+
+    def test_qa_route_label_policy(self, qa_chain_with_mock_llm):
+        """policy_qa 问题的 route_label"""
+        from config import ENABLE_QUERY_ROUTER
+
+        if not ENABLE_QUERY_ROUTER:
+            pytest.skip("Router 未启用，跳过测试")
+
+        result = qa_chain_with_mock_llm.ask("公司章程中关于分红的规定是什么？")
+        assert result["route_label"] == "policy_qa"
+
+    def test_qa_filter_auto_true(self, qa_chain_with_mock_llm):
+        """自动识别公司时 filter_auto 为 True"""
+        from config import ENABLE_QUERY_ROUTER
+
+        if not ENABLE_QUERY_ROUTER:
+            pytest.skip("Router 未启用，跳过测试")
+
+        result = qa_chain_with_mock_llm.ask("陕国投A的营收是多少？")
+        # 如果自动识别了公司名，filter_auto 应为 True
+        if result["filter_used"]:
+            assert result["filter_auto"] is True
+
+    def test_qa_filter_auto_false(self, qa_chain_with_mock_llm):
+        """显式指定 filter 时 filter_auto 为 False"""
+        from config import ENABLE_QUERY_ROUTER
+
+        if not ENABLE_QUERY_ROUTER:
+            pytest.skip("Router 未启用，跳过测试")
+
+        result = qa_chain_with_mock_llm.ask("营收是多少？", filter_file="陕国投A")
+        assert result["filter_auto"] is False
+        assert result["filter_used"] == "陕国投A"

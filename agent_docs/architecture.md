@@ -2,19 +2,44 @@
 
 ## Data Flow
 
+### Ingestion Flow
 ```
 data/raw/ → DocumentRouter → Parser → Chunker（三阶段）
   → BGEm3EmbeddingService → ChromaDB + SQLite
-
-Query → RerankRetriever（粗检索 top-30 → BGE-Reranker 精排 top-10）
-  → QAChain → LLM（Kimi / Qwen）→ JSON response
 ```
+
+### Query Flow (with Query Router)
+```
+Query → QueryRouter.route()
+  ├── QueryClassifier.classify() → QueryClassification
+  │     ├── extract_company_filter() → auto filter
+  │     └── scene detection → generation_mode
+  ├── Retrieval (filtered / global / filtered_then_global)
+  │     └── RerankRetriever（粗检索 top-30 → BGE-Reranker 精排 top-10）
+  └── RetrievedContext → QAChain
+        → LLM（Kimi / Qwen）→ JSON response
+```
+
+### Query Router Paths
+| Path | Condition | Description |
+|------|-----------|-------------|
+| `global` | No company filter | Search across all documents |
+| `filtered` | Has filter & results > threshold | Search within filtered company |
+| `filtered_then_global` | Auto filter empty & fallback allowed | Fallback to global when auto filter returns empty |
 
 ## Module Map
 
+### Query Router (新增)
 | Path | Responsibility |
 |------|----------------|
-| `config/settings.py` | 所有可调参数（chunk size、top-k、LLM、路径、policy keywords） |
+| `src/routing/models.py` | 数据契约：QueryClassification、RetrievedChunk、RetrievedContext |
+| `src/routing/query_classifier.py` | 查询分类：场景识别(factual/comparison/extraction/policy_qa) + 公司提取 + 生成模式判定 |
+| `src/routing/query_router.py` | 检索编排：三路径检索(global/filtered/filtered_then_global) + 回退机制 |
+
+### Core Modules
+| Path | Responsibility |
+|------|----------------|
+| `config/settings.py` | 所有可调参数（chunk size、top-k、LLM、路径、policy keywords、Query Router 配置） |
 | `src/ingestion/pipeline.py` | 文档→chunks→embed→store 编排 |
 | `src/ingestion/document_router.py` | 多格式路由（PDF/DOCX/PPTX/XLSX/TXT/MD/CSV） |
 | `src/ingestion/pdf_parser.py` | pdfplumber；表格→Markdown；列名提取（D1）；跨页合并（D2） |

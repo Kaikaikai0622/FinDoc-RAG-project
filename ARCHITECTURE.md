@@ -13,6 +13,11 @@ RAG_1/
 │   ├── evaluation.md           # Evaluator 指标、5-Block Flow、QA Schema v1.1
 │   └── testing-guide.md        # 冒烟测试、评估测试、chunk 质量验证
 ├── src/
+│   ├── routing/
+│   │   ├── __init__.py         # Query Router 模块入口
+│   │   ├── models.py           # QueryClassification / RetrievedChunk / RetrievedContext
+│   │   ├── query_classifier.py # 查询分类器：场景识别 + 公司提取 + 生成模式判定
+│   │   └── query_router.py     # 查询路由器：检索编排 + 回退机制
 │   ├── ingestion/
 │   │   ├── pipeline.py         # 串联：路由→解析→切块→embedding→入库
 │   │   ├── document_router.py  # 多格式路由（PDF/DOCX/PPTX/XLSX/TXT/MD/CSV）
@@ -62,6 +67,9 @@ RAG_1/
 └── tests/                          # 测试套件（四层测试金字塔）
     ├── unit/                       # 单元测试（函数/类级别，大量使用 Mock）
     │   ├── test_document_router.py # DocumentRouter 多格式路由测试
+    │   ├── test_query_classifier.py # QueryClassifier 单元测试（22个）
+    │   ├── test_query_router.py    # QueryRouter 单元测试（17个）
+    │   ├── test_qa_chain_router.py # QAChain Router 集成测试（10个）
     │   └── check_imports.py        # 依赖导入健康检查
     ├── smoke/                      # 组件/冒烟测试（单组件完整功能）
     │   ├── test_chunker_fixes.py   # Chunker 冒烟测试（TableSummary + 跨页政策段落）
@@ -79,6 +87,8 @@ RAG_1/
     │   ├── test_qa_pipeline.py          # QA Pipeline（Question→检索→LLM Generation）
     │   ├── test_evaluation_pipeline.py  # Evaluation Pipeline（QA对→评估→报告）
     │   ├── test_api.py                  # API 集成测试（FastAPI TestClient）
+    │   ├── test_api_router.py           # API Router 集成测试（6个）
+    │   ├── test_evaluator_router.py     # Evaluator Router 集成测试（6个）
     │   └── fixtures/                    # 测试数据目录
     │       ├── sample_pdfs/             # PDF 样本文件
     │       ├── sample_qa/               # 测试 QA 数据集

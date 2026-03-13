@@ -23,6 +23,7 @@ from config import (
     QWEN_BASE_URL,
     KIMI_MODEL,
     KIMI_BASE_URL,
+    ENABLE_QUERY_ROUTER,
 )
 
 logger = logging.getLogger(__name__)
@@ -174,8 +175,42 @@ class Evaluator:
                 model_answer = result.get("answer", "")
                 retrieved_sources = result.get("sources", [])
 
-                # 为 Ragas 获取上下文文本（不依赖 qa_chain 返回结构）
-                retrieved_chunks = self.qa_chain.retriever.search(question)
+                # ═══════════════════════════════════════════════════════════════
+                # Phase 6 Fix: 使用真实检索上下文，而不是重新检索
+                # ═══════════════════════════════════════════════════════════════
+                if "retrieved_context" in result and result["retrieved_context"]:
+                    # Router 模式：使用 QAChain 返回的真实上下文
+                    retrieved_chunks = [
+                        {
+                            "chunk_id": chunk.get("chunk_id", ""),
+                            "chunk_text": chunk.get("chunk_text", ""),
+                            "source_file": chunk.get("source_file", ""),
+                            "page_number": chunk.get("page_number", 0),
+                            "score": chunk.get("score", 0),
+                        }
+                        for chunk in result["retrieved_context"].get("chunks", [])
+                    ]
+                    # 提取路由元信息
+                    router_metadata = {
+                        "route_label": result.get("route_label"),
+                        "retrieval_mode": result.get("retrieval_mode"),
+                        "fallback_triggered": result.get("fallback_triggered"),
+                        "query_classifier": result.get("query_classifier"),
+                    }
+                else:
+                    # 旧模式回退：兼容未启用 Router 的情况
+                    # 需要将 sources 转换为 chunks 格式
+                    retrieved_chunks = [
+                        {
+                            "chunk_id": source.get("file", "") + f"_{i}",
+                            "chunk_text": "",  # 旧模式可能没有 chunk_text
+                            "source_file": source.get("file", ""),
+                            "page_number": source.get("page", 0),
+                            "score": source.get("score", 0),
+                        }
+                        for i, source in enumerate(retrieved_sources)
+                    ]
+                    router_metadata = None
 
                 # 计算基础指标
                 basic_metrics = self._compute_basic_metrics(
@@ -226,7 +261,7 @@ class Evaluator:
                     })
 
                 # 记录详情
-                details.append({
+                detail_entry = {
                     "id": qid,
                     "question": question,
                     "ground_truth": ground_truth,
@@ -237,7 +272,22 @@ class Evaluator:
                     "is_synthetic": is_synthetic,
                     "sources": retrieved_sources,
                     **basic_metrics,
-                })
+                }
+                # 添加路由元信息（如果存在）
+                if router_metadata:
+                    detail_entry["route_label"] = router_metadata.get("route_label")
+                    detail_entry["retrieval_mode"] = router_metadata.get("retrieval_mode")
+                    detail_entry["fallback_triggered"] = router_metadata.get("fallback_triggered")
+                    if router_metadata.get("query_classifier"):
+                        qc = router_metadata["query_classifier"]
+                        detail_entry["query_classifier"] = {
+                            "scene": qc.get("scene"),
+                            "generation_mode": qc.get("generation_mode"),
+                            "filter_source": qc.get("filter_source"),
+                            "retrieval_scope": qc.get("retrieval_scope"),
+                            "confidence": qc.get("confidence"),
+                        }
+                details.append(detail_entry)
 
             except Exception as e:
                 logger.error(f"评估问题 {question[:30]}... 时出错: {e}")
@@ -821,6 +871,7 @@ class Evaluator:
             "embedding_model": EMBEDDING_MODEL,
             "llm_provider": LLM_PROVIDER,
             "use_reranker": USE_RERANKER,
+            "enable_query_router": ENABLE_QUERY_ROUTER,  # Phase 6: 记录 Router 开关
         }
         if USE_RERANKER:
             cfg["retrieval_top_k"] = RETRIEVAL_TOP_K   # 粗检索候选数
@@ -829,6 +880,18 @@ class Evaluator:
             cfg["top_k"] = RERANK_TOP_K                # 向后兼容 report 读取
         else:
             cfg["top_k"] = TOP_K
+
+        # Phase 6: 记录 Router 配置（如果启用）
+        if ENABLE_QUERY_ROUTER:
+            from config import (
+                QUERY_ROUTER_ALLOW_AUTO_FILTER_FALLBACK,
+                QUERY_ROUTER_ALLOW_EXPLICIT_FILTER_FALLBACK,
+                QUERY_ROUTER_EMPTY_RESULT_THRESHOLD,
+            )
+            cfg["router_allow_auto_fallback"] = QUERY_ROUTER_ALLOW_AUTO_FILTER_FALLBACK
+            cfg["router_allow_explicit_fallback"] = QUERY_ROUTER_ALLOW_EXPLICIT_FILTER_FALLBACK
+            cfg["router_empty_threshold"] = QUERY_ROUTER_EMPTY_RESULT_THRESHOLD
+
         return cfg
 
 

@@ -5,6 +5,7 @@
 """
 import argparse
 import logging
+import os
 import sys
 from pathlib import Path
 
@@ -21,6 +22,34 @@ sys.path.insert(0, str(PROJECT_ROOT))
 
 from src.ingestion import IngestionPipeline
 from config import DATA_RAW_DIR
+
+
+# 这些取值常见于“临时禁用 CUDA”，会导致 torch 看不到 GPU。
+_GPU_MASK_VALUES = {"", "-1", "none", "null"}
+
+
+def ensure_ingest_gpu_visibility(force_cpu: bool = False) -> None:
+    """修复 ingest 进程中的 GPU 可见性。
+
+    默认策略：优先 GPU。若环境变量误将 GPU 屏蔽，则自动清理。
+    若传入 force_cpu，则显式设置为 CPU。
+    """
+    if force_cpu:
+        os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+        logger.info("[Ingest] 已启用 --cpu，强制使用 CPU")
+        return
+
+    raw_value = os.environ.get("CUDA_VISIBLE_DEVICES")
+    if raw_value is None:
+        return
+
+    normalized = raw_value.strip().lower()
+    if normalized in _GPU_MASK_VALUES:
+        os.environ.pop("CUDA_VISIBLE_DEVICES", None)
+        logger.warning(
+            "[Ingest] 检测到 CUDA_VISIBLE_DEVICES=%r 可能屏蔽 GPU，已自动清理。",
+            raw_value,
+        )
 
 
 def find_pdf_files(path: str) -> list[str]:
@@ -92,11 +121,18 @@ def main() -> None:
         action="store_true",
         help="输出详细日志",
     )
+    parser.add_argument(
+        "--cpu",
+        action="store_true",
+        help="强制使用 CPU（默认优先 GPU）",
+    )
 
     args = parser.parse_args()
 
     if args.verbose:
         logging.getLogger().setLevel(logging.DEBUG)
+
+    ensure_ingest_gpu_visibility(force_cpu=args.cpu)
 
     # 确定输入路径
     if args.file:

@@ -31,6 +31,15 @@ class SourceInfo(BaseModel):
     score: float
 
 
+class QueryClassifierInfo(BaseModel):
+    """查询分类器信息（轻量）"""
+    scene: str
+    generation_mode: str
+    filter_source: str
+    retrieval_scope: str
+    confidence: float
+
+
 class QueryResponse(BaseModel):
     """问答响应"""
     question: str
@@ -39,6 +48,14 @@ class QueryResponse(BaseModel):
     chunks_used: int
     retrieval_time: float
     generation_time: float
+    total_time: float  # 新增
+    mode: str  # 新增: single_step / two_step
+    filter_used: str | None  # 新增
+    filter_auto: bool  # 新增
+    route_label: str | None = None  # 新增: Router 场景标签
+    retrieval_mode: str | None = None  # 新增: filtered / global / filtered_then_global
+    fallback_triggered: bool | None = None  # 新增: 是否触发回退
+    query_classifier: QueryClassifierInfo | None = None  # 新增: 分类器详情
 
 
 @app.get("/")
@@ -68,7 +85,7 @@ def query(request: QueryRequest):
         request: 问答请求，包含问题和可选的过滤条件
 
     Returns:
-        问答响应，包含答案和引用来源
+        问答响应，包含答案和引用来源，以及 Router 元信息（如果启用）
     """
     if not request.question or not request.question.strip():
         raise HTTPException(status_code=400, detail="问题不能为空")
@@ -86,14 +103,40 @@ def query(request: QueryRequest):
             for source in result["sources"]
         ]
 
-        return QueryResponse(
-            question=result["question"],
-            answer=result["answer"],
-            sources=sources,
-            chunks_used=result["chunks_used"],
-            retrieval_time=result["retrieval_time"],
-            generation_time=result["generation_time"],
-        )
+        # 构建基础响应（始终存在的字段）
+        response_data = {
+            "question": result["question"],
+            "answer": result["answer"],
+            "sources": sources,
+            "chunks_used": result["chunks_used"],
+            "retrieval_time": result["retrieval_time"],
+            "generation_time": result["generation_time"],
+            "total_time": result.get("total_time", result["retrieval_time"] + result["generation_time"]),
+            "mode": result["mode"],
+            "filter_used": result["filter_used"],
+            "filter_auto": result["filter_auto"],
+        }
+
+        # 添加 Router 相关字段（如果存在）
+        if "route_label" in result:
+            response_data["route_label"] = result["route_label"]
+        if "retrieval_mode" in result:
+            response_data["retrieval_mode"] = result["retrieval_mode"]
+        if "fallback_triggered" in result:
+            response_data["fallback_triggered"] = result["fallback_triggered"]
+
+        # 添加 query_classifier 信息（如果存在）
+        if "query_classifier" in result:
+            qc = result["query_classifier"]
+            response_data["query_classifier"] = QueryClassifierInfo(
+                scene=qc["scene"],
+                generation_mode=qc["generation_mode"],
+                filter_source=qc["filter_source"],
+                retrieval_scope=qc["retrieval_scope"],
+                confidence=qc["confidence"],
+            )
+
+        return QueryResponse(**response_data)
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"处理失败: {str(e)}")
