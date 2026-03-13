@@ -10,9 +10,18 @@
 ## 技术架构
 
 ```
-PDF/DOCX/XLSX → 文档解析 → 智能切块 → 向量化(bge-m3) → ChromaDB
-                                                            ↓
-LLM(Kimi/Qwen) ← 答案生成 ← 精排(bge-reranker) ← 向量检索(Top-30 → Top-7)
+PDF/DOCX/XLSX -> 文档解析 -> 智能切块 -> 向量化(bge-m3) -> ChromaDB
+                                                            |
+用户问题 -> Query Router(查询分类: specific/global) ---------+
+             |                                      |
+             | (specific_query)                     | (global_summary)
+             v                                      v
+       向量检索(Top-30) -> 精排(bge-reranker, Top-7)    粗召回/相关性过滤 -> 分层摘要(Map-Reduce)
+                               |                                      |
+                               +------------- 上下文融合 --------------+
+                                              |
+                                              v
+                                     答案生成 -> LLM(Kimi/Qwen)
 ```
 
 **核心模型**：
