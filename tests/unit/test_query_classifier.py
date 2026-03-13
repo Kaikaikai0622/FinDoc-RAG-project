@@ -7,11 +7,13 @@
 4. 普通 factual → single_step
 5. reason_codes 完整
 """
-import pytest
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 
-from src.routing.query_classifier import QueryClassifier, _TWO_STEP_KEYWORDS
+from src.routing.query_classifier import QueryClassifier
 from src.routing.models import QueryClassification
+
+# Mock path for company extraction
+PATCH_PATH = "src.routing.query_classifier.extract_company_filter"
 
 
 class TestQueryClassifierBasic:

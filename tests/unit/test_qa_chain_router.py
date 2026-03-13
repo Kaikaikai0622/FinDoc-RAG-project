@@ -6,7 +6,6 @@
 3. 保留向后兼容的旧字段
 4. 旧模式回退（ENABLE_QUERY_ROUTER=False）
 """
-import pytest
 from unittest.mock import MagicMock, patch
 
 from src.generation.qa_chain import QAChain

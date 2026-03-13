@@ -1,6 +1,62 @@
 # Retrieval & Generation
 
-## 检索流程（Two-Stage）
+## 检索流程
+
+### 方式一：Query Router 模式（默认，`ENABLE_QUERY_ROUTER=True`）
+
+Query Router 提供统一的查询分类、检索编排和回退机制：
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                     QueryRouter.route()                      │
+├─────────────────────────────────────────────────────────────┤
+│  1. QueryClassifier.classify(query, filter_file)            │
+│     ├── 确定 filter_source: explicit / auto_company / none  │
+│     ├── 确定 retrieval_scope: single_company / global       │
+│     ├── 确定 fallback_allowed: True / False                 │
+│     ├── 检测 scene: factual/comparison/extraction/policy_qa │
+│     └── 确定 generation_mode: single_step / two_step        │
+│                                                             │
+│  2. Execute Retrieval                                       │
+│     ├── scope=global → global search                        │
+│     └── scope=single_company → filtered search              │
+│         ├── results > threshold → return filtered          │
+│         └── results <= threshold & fallback_allowed        │
+│             → fallback to global (filtered_then_global)     │
+│                                                             │
+│  3. Return RetrievedContext                                 │
+│     ├── chunks: List[RetrievedChunk]                        │
+│     ├── retrieval_mode: filtered/global/filtered_then_global│
+│     ├── fallback_triggered: bool                            │
+│     └── classification: QueryClassification                 │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**检索路径详解**
+
+| 路径 | 触发条件 | 回退 | 适用场景 |
+|------|----------|------|----------|
+| `global` | 无公司名识别 | - | 跨公司比较、通用问题 |
+| `filtered` | 显式/自动识别公司 + 有结果 | - | 单公司问题 |
+| `filtered_then_global` | 自动识别公司 + 空结果 + 允许回退 | 是 | 误识别公司时兜底 |
+
+**配置项** (`config/settings.py`)
+
+```python
+ENABLE_QUERY_ROUTER = True                           # 总开关
+QUERY_ROUTER_ALLOW_AUTO_FILTER_FALLBACK = True       # 自动识别允许回退
+QUERY_ROUTER_ALLOW_EXPLICIT_FILTER_FALLBACK = False  # 显式过滤不允许回退
+QUERY_ROUTER_EMPTY_RESULT_THRESHOLD = 0              # 空结果才回退
+QUERY_ROUTER_CONFIDENCE_THRESHOLD = 0.6              # 分类置信度阈值
+```
+
+### 方式二：传统模式（`ENABLE_QUERY_ROUTER=False`）
+
+直接使用 RerankRetriever，无路由和回退机制。
+
+---
+
+## Two-Stage 检索（在 Router 内部使用）
 
 **默认模式（`USE_RERANKER=True`）**
 1. 向量检索：embed query → ChromaDB ANN → 取 `RETRIEVAL_TOP_K=30` 候选

@@ -6,7 +6,7 @@
 3. 默认不返回原始 chunk 文本
 """
 import pytest
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 from fastapi.testclient import TestClient
 
 

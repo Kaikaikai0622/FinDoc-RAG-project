@@ -13,7 +13,7 @@ from src.generation.prompts import (
     CONCLUDE_USER_TEMPLATE,
     format_context,
 )
-from src.routing import QueryRouter, QueryClassification
+from src.routing import QueryRouter
 from config import USE_RERANKER, ENABLE_QUERY_ROUTER
 
 

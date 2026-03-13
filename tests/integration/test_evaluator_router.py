@@ -5,11 +5,9 @@
 2. details 中记录路由元信息
 3. config 中记录 Router 开关状态
 """
-import pytest
 from unittest.mock import MagicMock, patch
 
-from src.evaluation.evaluator import Evaluator, EvalResult
-from src.evaluation.dataset import EvalDataset
+from src.evaluation.evaluator import Evaluator
 
 
 class TestEvaluatorUsesRealContext:

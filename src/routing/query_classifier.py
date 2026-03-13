@@ -13,12 +13,11 @@ from __future__ import annotations
 import re
 from typing import TYPE_CHECKING
 
-from config import ENABLE_QUERY_ROUTER
 from src.routing.models import QueryClassification
 from src.utils.company_resolver import extract_company_filter
 
 if TYPE_CHECKING:
-    from collections.abc import Sequence
+    pass
 
 
 # 触发两步生成流程的场景关键词（从 qa_chain.py 迁移）

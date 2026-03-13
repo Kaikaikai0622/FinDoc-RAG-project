@@ -55,7 +55,14 @@ class BGERerankerV2M3(BaseReranker):
         import torch
         from sentence_transformers import CrossEncoder
 
-        device = "cuda" if torch.cuda.is_available() else "cpu"
+        device = "cpu"
+        if torch.cuda.is_available() and torch.cuda.device_count() > 0:
+            try:
+                torch.cuda.get_device_name(0)
+                device = "cuda"
+            except Exception as exc:
+                logger.warning("Reranker GPU 初始化失败，回退到 CPU: %s", exc)
+
         # fp16 只在 CUDA 可用时才有意义；通过 model_kwargs 传入兼容当前 sentence-transformers 版本
         model_kwargs = {}
         if self._use_fp16 and device == "cuda":
@@ -65,11 +72,24 @@ class BGERerankerV2M3(BaseReranker):
             "加载 Reranker 模型 %s (device=%s, fp16=%s)",
             self._model_name, device, bool(model_kwargs),
         )
-        self._model = CrossEncoder(
-            self._model_name,
-            device=device,
-            model_kwargs=model_kwargs or None,
-        )
+
+        try:
+            self._model = CrossEncoder(
+                self._model_name,
+                device=device,
+                model_kwargs=model_kwargs or None,
+            )
+        except Exception as exc:
+            if device == "cuda":
+                logger.warning("Reranker 在 GPU 上加载失败，回退到 CPU: %s", exc)
+                self._model = CrossEncoder(
+                    self._model_name,
+                    device="cpu",
+                    model_kwargs=None,
+                )
+            else:
+                raise
+
         logger.info("Reranker 模型加载完毕")
 
     def rerank(
