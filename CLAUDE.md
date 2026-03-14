@@ -8,7 +8,7 @@
 
 - **Runtime**: Python 3.12, FastAPI, Uvicorn
 - **Parsing**: pdfplumber, python-docx, python-pptx, openpyxl
-- **Chunking**: LlamaIndex SentenceSplitter（256 chars / 50 overlap）
+- **Chunking**: LlamaIndex SentenceSplitter（512 chars / 80 overlap）
 - **Embedding**: BAAI/bge-m3（1024-dim, sentence-transformers）
 - **Vector DB**: ChromaDB（持久化, `data/chroma_db/`）
 - **Doc Store**: SQLite（`data/doc_store.db`）

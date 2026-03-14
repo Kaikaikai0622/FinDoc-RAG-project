@@ -23,7 +23,7 @@
 
 阶段 2    文本 chunk 生成
           政策段落 → 整段保留（超出 POLICY_MAX_CHARS 才用宽松分割器）
-          普通段落 → SentenceSplitter（CHUNK_SIZE=256, CHUNK_OVERLAP=50）
+          普通段落 → SentenceSplitter（CHUNK_SIZE=512, CHUNK_OVERLAP=80）
 
 阶段 3    表格 chunk 生成
           整表作为 1 个 chunk；超 TABLE_MAX_CHARS=4000 则按行分段
@@ -44,9 +44,9 @@
 
 | Constant | Value | Notes |
 |----------|-------|-------|
-| `CHUNK_SIZE` | 256 | SentenceSplitter 字符上限 |
-| `CHUNK_OVERLAP` | 50 | 相邻 chunk 重叠字符数 |
-| `POLICY_MAX_CHARS` | 2000 | 政策段落整段保留上限 |
-| `TABLE_MAX_CHARS` | 4000 | 单表 chunk 字符上限，超出则按行分段 |
-| `TABLE_ROWS_PER_SEGMENT` | 30 | 按行分段时每段最大行数 |
+| `CHUNK_SIZE` | 512   | SentenceSplitter 字符上限 |
+| `CHUNK_OVERLAP` | 80    | 相邻 chunk 重叠字符数 |
+| `POLICY_MAX_CHARS` | 2000  | 政策段落整段保留上限 |
+| `TABLE_MAX_CHARS` | 4000  | 单表 chunk 字符上限，超出则按行分段 |
+| `TABLE_ROWS_PER_SEGMENT` | 30    | 按行分段时每段最大行数 |
 
