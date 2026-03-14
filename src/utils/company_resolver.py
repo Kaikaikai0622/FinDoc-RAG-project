@@ -188,13 +188,10 @@ class CompanyResolver:
             question: 用户问题
 
         Returns:
-            用于 filter_file 的字符串，未匹配返回 None
+            用于 filter_file 的完整 source_file，未匹配返回 None
         """
-        company, filename = self.resolve(question)
-        if filename:
-            # 返回公司名称部分（用于$contains匹配）
-            return company
-        return None
+        _, filename = self.resolve(question)
+        return filename
 
 
 # 全局实例（单例模式）
@@ -220,9 +217,9 @@ def extract_company_filter(question: str) -> Optional[str]:
 
     示例：
         >>> extract_company_filter("陕国投的营收是多少？")
-        '陕国投A'
+        '陕国投Ａ：2025年年度报告.pdf'
         >>> extract_company_filter("芯导科技的利润如何？")
-        '芯导科技'
+        '芯导科技：2025年年度报告.pdf'
         >>> extract_company_filter("介绍一下这家公司的业务")  # 未提及具体公司
         None
     """

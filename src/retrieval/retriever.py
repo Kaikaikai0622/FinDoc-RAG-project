@@ -41,7 +41,7 @@ class Retriever:
         Args:
             query: 用户问题
             top_k: 返回 top k 结果，默认从 settings.TOP_K 读取
-            filter_file: 按来源文件名过滤（支持部分匹配，如"陕国投"匹配"陕国投A：2025年年度报告.pdf"）
+            filter_file: 按完整来源文件名过滤（如"陕国投Ａ：2025年年度报告.pdf"）
 
         Returns:
             相关文档片段列表，每项包含 chunk_id, chunk_text, source_file, page_number, score
@@ -52,8 +52,8 @@ class Retriever:
         # 构建 ChromaDB where 过滤条件
         where_filter = None
         if filter_file:
-            # 使用 $contains 进行部分匹配
-            where_filter = {"source_file": {"$contains": filter_file}}
+            # 使用精确匹配，避免 $contains 在部分 Chroma 版本/配置下返回空结果
+            where_filter = {"source_file": {"$eq": filter_file}}
 
         # 1. 将问题向量化
         query_embedding = self.embedding_service.embed([query])[0]
@@ -91,7 +91,7 @@ def retrieve(query: str, top_k: int | None = None, filter_file: str | None = Non
     Args:
         query: 用户问题
         top_k: 返回 top k 结果
-        filter_file: 按来源文件名过滤
+        filter_file: 按完整来源文件名过滤
 
     Returns:
         相关文档片段列表

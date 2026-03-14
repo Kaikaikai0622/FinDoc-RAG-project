@@ -5,8 +5,8 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).parent.parent
 
 # ========== 切块参数 ==========
-CHUNK_SIZE = 256  # 每个 chunk 的字符数
-CHUNK_OVERLAP = 50  # 相邻 chunk 之间的重叠字符数
+CHUNK_SIZE = 512  # 每个 chunk 的字符数
+CHUNK_OVERLAP = 80  # 相邻 chunk 之间的重叠字符数
 
 # 政策/条款类段落整段合并 chunking
 # 当文本元素的 section_title 或文本内容命中这些关键词时，不按固定 token 数切分，

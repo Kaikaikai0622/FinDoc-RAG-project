@@ -31,14 +31,21 @@ print("[测试1] where 过滤条件构建")
 def build_where_filter(filter_file: str | None):
     """模拟 Retriever 中的 where 条件构建"""
     if filter_file:
-        return {"source_file": {"$contains": filter_file}}
+        return {"source_file": {"$eq": filter_file}}
     return None
 
 test_cases = [
     (None, None, "无过滤时返回 None"),
-    ("陕国投", {"source_file": {"$contains": "陕国投"}}, "有过滤时返回 contains 条件"),
-    ("2025年年度报告", {"source_file": {"$contains": "2025年年度报告"}}, "支持完整文件名匹配"),
-    ("指南", {"source_file": {"$contains": "指南"}}, "支持部分匹配"),
+    (
+        "陕国投Ａ：2025年年度报告.pdf",
+        {"source_file": {"$eq": "陕国投Ａ：2025年年度报告.pdf"}},
+        "有过滤时返回 eq 条件",
+    ),
+    (
+        "指南针：2025年年度报告.pdf",
+        {"source_file": {"$eq": "指南针：2025年年度报告.pdf"}},
+        "按完整 source_file 精确匹配",
+    ),
 ]
 
 for filter_file, expected, desc in test_cases:

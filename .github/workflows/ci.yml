@@ -3,8 +3,18 @@ name: CI
 on:
   push:
     branches: [ main, develop ]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - 'agent_docs/**'
+      - '.gitignore'
   pull_request:
     branches: [ main ]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - 'agent_docs/**'
+      - '.gitignore'
 
 jobs:
   # =========================================================================
